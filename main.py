@@ -1,37 +1,46 @@
+import time
 from pandas_datareader import data as pdr
-import fix_yahoo_finance as yf
-
-yf.pdr_override()
-startTime = "2017-10-01"
-endTime = "2018-10-01"
+from requests_html import HTMLSession
+session = HTMLSession()
 
 
-def getsDataFromYahooFinance(company):
+def convertTime(target):
+    st = time.strptime(target, '%Y-%m-%d')
+    return str(int(time.mktime(st)))
+
+
+def getsDataFromYahooFinance(company, start, end):
+    url = 'https://finance.yahoo.com/quote/' + company + \
+        '/history?period1=' + \
+        convertTime(start) + \
+        '&period2=' + convertTime(end) + \
+        '&interval=1d&filter=history&frequency=1d'
     data = None
+
     try:
-        data = pdr.get_data_yahoo(company, start=startTime, end=endTime)
-        # 輸出成 csv 方便自己查看
-        data.to_csv('.\\output\\' + company + '.csv')
+        response = session.get(url)
+        select = '#Col1-1-HistoricalDataTable-Proxy > section > div:nth-child(2)> table > tbody'
+        table = response.html.find(select, first=True)
+        data = table.text
     except:
         print('Something Error, Please Try Again!')
+
     return data
 
 
 def getVIX(company):
-    print('VIX Not Yet!')
+    print('-----\nVIX Not Yet!')
 
 
 def calculateVolatility(data):
-    print('Volatility Not Yet!')
+    print('-----\nVolatility Not Yet!')
 
 
-def getDataAndCalculate(company):
-    companyData = getsDataFromYahooFinance(company)
-    calculateVolatility(companyData)
+def getDataAndCalculate(company, start, end):
+    companyData = getsDataFromYahooFinance(company, start, end)
+    print(companyData)
+    # calculateVolatility(companyData)
 
 
-# 從這開始看
-# 填入公司名字
-getDataAndCalculate('AAPL')
-getDataAndCalculate('GOOG')
-getDataAndCalculate('AMZN')
+# 填入公司名字、起始時間、結束時間
+getDataAndCalculate('AAPL', '2018-07-01', '2018-9-01')
