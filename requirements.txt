@@ -1,2 +1,1 @@
 pandas-datareader
-requests_html

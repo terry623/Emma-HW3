@@ -1,27 +1,17 @@
-import time
+import datetime
 from pandas_datareader import data as pdr
-from requests_html import HTMLSession
-session = HTMLSession()
+
+start = datetime.datetime(2016, 10, 1)
+end = datetime.datetime(2018, 10, 1)
 
 
-def convertTime(target):
-    st = time.strptime(target, '%Y-%m-%d')
-    return str(int(time.mktime(st)))
-
-
-def getsDataFromYahooFinance(company, start, end):
-    url = 'https://finance.yahoo.com/quote/' + company + \
-        '/history?period1=' + \
-        convertTime(start) + \
-        '&period2=' + convertTime(end) + \
-        '&interval=1d&filter=history&frequency=1d'
+def getsDataFromYahooFinance(company):
     data = None
 
     try:
-        response = session.get(url)
-        select = '#Col1-1-HistoricalDataTable-Proxy > section > div:nth-child(2)> table > tbody'
-        table = response.html.find(select, first=True)
-        data = table.text
+        data = pdr.DataReader('AAPL', 'yahoo', start, end)
+        # 也會輸出成 csv 方便自己查看
+        data.to_csv('.\\output\\' + company + '.csv')
     except:
         print('Something Error, Please Try Again!')
 
@@ -36,11 +26,14 @@ def calculateVolatility(data):
     print('-----\nVolatility Not Yet!')
 
 
-def getDataAndCalculate(company, start, end):
-    companyData = getsDataFromYahooFinance(company, start, end)
-    print(companyData)
+def getDataAndCalculate(company):
+    companyData = getsDataFromYahooFinance(company)
     # calculateVolatility(companyData)
 
 
-# 填入公司名字、起始時間、結束時間
-getDataAndCalculate('AAPL', '2018-07-01', '2018-9-01')
+# 從這開始看
+# 填入公司名字
+getDataAndCalculate('AAPL')
+getDataAndCalculate('GOOG')
+getDataAndCalculate('AMZN')
+print('\nFINISH !!')
