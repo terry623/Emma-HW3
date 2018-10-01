@@ -1,21 +1,27 @@
-import datetime
 from pandas_datareader import data as pdr
+import datetime
 
 start = datetime.datetime(2016, 10, 1)
 end = datetime.datetime(2018, 10, 1)
 
 
 def getsDataFromYahooFinance(company):
-    data = None
+    data = pdr.DataReader('AAPL', 'yahoo', start, end)
 
-    try:
-        data = pdr.DataReader('AAPL', 'yahoo', start, end)
-        # 也會輸出成 csv 方便自己查看
-        data.to_csv('.\\output\\' + company + '.csv')
-    except:
-        print('Something Error, Please Try Again!')
+    toCSV(data, company)
+    drawChart(data, company)
 
     return data
+
+
+def toCSV(data, company):
+    # 輸出成 CSV 方便自己觀看
+    data.to_csv('.\\output\\' + company + '.csv')
+
+
+def drawChart(data, company):
+    # 先畫除了 Volume 的 Column
+    data.drop(columns=['Volume']).plot()
 
 
 def getVIX(company):
