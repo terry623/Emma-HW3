@@ -20,7 +20,7 @@ def toCSV(data, company):
 
 
 def drawChart(data, company):
-    # 先畫除了 Volume 的 Column
+    # 先畫除了 Volume 以外的 Column
     data.drop(columns=['Volume']).plot()
 
 
