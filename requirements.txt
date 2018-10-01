@@ -1,0 +1,2 @@
+fix_yahoo_finance
+pandas-datareader
