@@ -6,7 +6,7 @@ end = datetime.datetime(2018, 10, 1)
 
 
 def getsDataFromYahooFinance(company):
-    data = pdr.DataReader('AAPL', 'yahoo', start, end)
+    data = pdr.DataReader(company, 'yahoo', start, end)
 
     toCSV(data, company)
     drawChart(data, company)
