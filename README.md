@@ -7,6 +7,13 @@
 $ pip install -r requirements.txt
 $ python main.py
 ```
+
+### 待做清單
+
+- [ ] 確認 VIX 指數是整體的，還是各公司 ?
+- [ ] 波動率公式 ( 參考 output 資料夾中 .csv 檔，數字該如何代入 )
+
+
 ### 概念釐清
 
 > 題目中提到的 pandas-datareader 是一個 API
