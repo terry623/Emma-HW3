@@ -1,2 +1,3 @@
 pandas-datareader
+pandas
 numpy
