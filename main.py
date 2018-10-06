@@ -3,24 +3,10 @@ import numpy as np
 import datetime
 import math
 
-start = datetime.datetime(2018, 8, 1)
-end = datetime.datetime(2018, 9, 30)
+allDataStart = datetime.datetime(2016, 10, 1)
+allDataEnd = datetime.datetime(2018, 10, 1)
 dateRange = 30
-data = None
-
-
-def getsDataFromYahooFinance(company):
-    result = pdr.DataReader(company, 'yahoo', start, end)
-
-    toCSV(result, company)
-    drawChart(result, company)
-
-    return result
-
-
-def toCSV(result, company):
-    # 輸出成 CSV 方便自己觀看
-    result.to_csv('.\\output\\' + company + '.csv')
+numberOfTimes = 500 - dateRange + 1
 
 
 def drawChart(result, company):
@@ -32,55 +18,53 @@ def getVIX(company):
     print('-----\nVIX Not Yet!')
 
 
-def calculatePopulationMean():
-    firstDay = data[0]
-    lastDay = data[dateRange-1]
+def calculatePopulationMean(data, start):
+    firstDay = data[start]
+    lastDay = data[start + dateRange - 1]
     differenceValue = abs(lastDay - firstDay)
     mean = math.log(differenceValue / firstDay) / dateRange
 
     return mean
 
 
-def calculateSumSecond(day, mean):
-    difference = data[day] - data[day-1]
-    deltaTSquare = (1 / 365) ** 0.5
-    result = (difference / (data[day] * deltaTSquare)
-              - mean * deltaTSquare) ** 2
-
-    return result
-
-
-def calculateSum(mean):
+def totalSum(data, mean, start):
     sumNum = 0
-    for day in range(dateRange-1):
-        sumNum += calculateSumSecond(day, mean)
+    startDay = start
+    endDay = start + dateRange - 1
+    print('startDay:', startDay + 1, ", endDay:", endDay + 1)
+
+    for day in range(startDay, endDay):
+        difference = data[day] - data[day-1]
+        deltaTSquare = (1 / 365) ** 0.5
+        result = (difference / (data[day] * deltaTSquare)
+                  - mean * deltaTSquare) ** 2
+        sumNum += result
 
     return sumNum
 
 
-def calculateHistoricalVolatility(mean):
-    historicalVolatility = (calculateSum(mean) / (dateRange - 1)) ** 0.5
+def calculateVolatility(data, mean, start):
+    historicalVolatility = (
+        totalSum(data, mean, start) / (dateRange - 1)) ** 0.5
 
     return historicalVolatility
 
 
-# 還沒動態變成 30 天
-def calculateVolatility(companyData, company):
-    # sort dates in descending order
+def calculate(companyData, company):
     companyData.sort_index(ascending=False, inplace=True)
-    companyData.to_csv('.\\output\\' + company + '_TEST.csv')
-
+    companyData.to_csv('.\\output\\' + company + '.csv')
     data = companyData['Close']
-    populationMean = calculatePopulationMean()
-    calculateHistoricalVolatility(populationMean)
+
+    for start in range(numberOfTimes):
+        populationMean = calculatePopulationMean(data, start)
+        historicalVolatility = calculateVolatility(data, populationMean, start)
+        print('historicalVolatility:', historicalVolatility, '\n')
 
 
 def getDataAndCalculate(company):
-    companyData = getsDataFromYahooFinance(company)
-    calculateVolatility(companyData, company)
+    companyData = pdr.DataReader(company, 'yahoo', allDataStart, allDataEnd)
+    calculate(companyData, company)
 
 
-# 從這開始看
-# 填入公司名字
 getDataAndCalculate('AAPL')
-print('\nFINISH !!')
+print('FINISH')
