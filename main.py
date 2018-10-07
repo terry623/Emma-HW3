@@ -13,8 +13,10 @@ numberOfTimes = 500 - dateRange + 1
 
 def drawChart(result, company):
     title = company + ' ( ' + str(dateRange) + ' days' + ' )'
-    figure = result.plot(x="startDay", y='volatility', title=title)
-    figure.set(xlabel='Number of Times')
+    figure = result.plot(x="startDay", y='volatility',
+                         title=title).get_figure()
+    # figure.set(xlabel='Number of Times')
+    figure.savefig('.\\OUTPUT\\' + company + '\\' + company + '.png')
 
 
 def getVIX(company):
@@ -70,7 +72,7 @@ def calculateAndDraw(companyData, company):
         result = result.append({'startDay': start, 'endDay': end,
                                 'volatility': historicalVolatility}, ignore_index=True)
     result.to_csv('.\\EXCEL\\' + company + '\\' + company + '_Result.csv')
-    # drawChart(result, company)
+    drawChart(result, company)
 
 
 def getDataAndCalculate(company):
