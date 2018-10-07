@@ -17,8 +17,8 @@ HW3
 ├── OUTPUT              // 計算結果的圖檔放置區
 ├── VIX                 // 從 CBOE 下載的公司 VIX 資料
 ├── .gitignore          // 不影響
-├── main.py             // 主要程式碼
 ├── README.md           // 說明文件（就是你現在看的）
+├── main.py             // 主要程式碼
 └── requirements.txt    // 安裝 package 的檔案
 ```
 
