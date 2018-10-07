@@ -12,35 +12,28 @@ numberOfTimes = 500 - dateRange + 1
 
 
 def drawChart(result, company):
-    # 先畫除了 Volume 以外的 Column
-    result.drop(columns=['Volume']).plot()
-
-
-# def toCSV(company):
-#     with open(company + '.csv', 'w', newline='') as csvfile:
-#         writer = csv.writer(csvfile)
-#         writer.writerow(['Spam'] * 5 + ['Baked Beans'])
+    title = company + ' ( ' + str(dateRange) + ' days' + ' )'
+    figure = result.plot(x="startDay", y='volatility', title=title)
+    figure.set(xlabel='Number of Times')
 
 
 def getVIX(company):
     print('-----\nVIX Not Yet!')
 
 
-def calculatePopulationMean(data, start):
+def calculatePopulationMean(data, start, end):
     firstDay = data[start]
-    lastDay = data[start + dateRange - 1]
+    lastDay = data[end]
     differenceValue = abs(lastDay - firstDay)
     mean = math.log(differenceValue / firstDay) / dateRange
 
     return mean
 
 
-def totalSum(data, mean, start):
+def totalSum(data, mean, start, end):
     sumNum = 0
-    startDay = start
-    endDay = start + dateRange - 1
 
-    for day in range(startDay, endDay):
+    for day in range(start, end):
         difference = data[day] - data[day-1]
         deltaTSquare = (1 / 365) ** 0.5
         result = (difference / (data[day] * deltaTSquare)
@@ -50,38 +43,40 @@ def totalSum(data, mean, start):
     return sumNum
 
 
-def calculateVolatility(data, mean, start):
+def calculateVolatility(data, mean, start, end):
     historicalVolatility = (
-        totalSum(data, mean, start) / (dateRange - 1)) ** 0.5
+        totalSum(data, mean, start, end) / (dateRange - 1)) ** 0.5
 
     return historicalVolatility
 
 
-def calculate(companyData, company):
+def calculateAndDraw(companyData, company):
     companyData.sort_index(ascending=False, inplace=True)
     companyData.to_csv('.\\output\\' + company + '.csv')
     data = companyData['Close']
 
     result = pd.DataFrame(columns=['startDay', 'endDay', 'volatility'])
-    for start in range(numberOfTimes):
-        populationMean = calculatePopulationMean(data, start)
-        historicalVolatility = calculateVolatility(data, populationMean, start)
 
-        startDay = start + 1
-        endDay = start + dateRange
+    # 從第二個開始算，因為要看前一天去算差值
+    for start in range(1, numberOfTimes + 1):
+        end = start + dateRange - 1
+        populationMean = calculatePopulationMean(data, start, end)
+        historicalVolatility = calculateVolatility(
+            data, populationMean, start, end)
 
-        print('startDay:', startDay, ", endDay:", endDay)
-        print('historicalVolatility:', historicalVolatility, '\n')
+        # print('startDay:', start, ", endDay:", end,
+        #       ', volatility:', historicalVolatility)
 
-        result = result.append({'startDay': startDay, 'endDay': endDay,
+        result = result.append({'startDay': start, 'endDay': end,
                                 'volatility': historicalVolatility}, ignore_index=True)
-    result.to_csv('.\\output\\' + company + '_result.csv')
+    drawChart(result, company)
 
 
 def getDataAndCalculate(company):
     companyData = pdr.DataReader(company, 'yahoo', allDataStart, allDataEnd)
-    calculate(companyData, company)
+    calculateAndDraw(companyData, company)
 
 
+getDataAndCalculate('GOOG')
+getDataAndCalculate('AMZN')
 getDataAndCalculate('AAPL')
-print('FINISH')
