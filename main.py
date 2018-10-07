@@ -18,7 +18,7 @@ def drawChart(result, company):
 
 
 def getVIX(company):
-    print('-----\nVIX Not Yet!')
+    print('VIX Not Yet!')
 
 
 def calculatePopulationMean(data, start, end):
@@ -52,7 +52,7 @@ def calculateVolatility(data, mean, start, end):
 
 def calculateAndDraw(companyData, company):
     companyData.sort_index(ascending=False, inplace=True)
-    companyData.to_csv('.\\output\\' + company + '.csv')
+    companyData.to_csv('.\\EXCEL\\' + company + '\\' + company + '.csv')
     data = companyData['Close']
 
     result = pd.DataFrame(columns=['startDay', 'endDay', 'volatility'])
@@ -64,12 +64,13 @@ def calculateAndDraw(companyData, company):
         historicalVolatility = calculateVolatility(
             data, populationMean, start, end)
 
-        # print('startDay:', start, ", endDay:", end,
-        #       ', volatility:', historicalVolatility)
+        print('startDay:', start, ", endDay:", end,
+              ', volatility:', historicalVolatility)
 
         result = result.append({'startDay': start, 'endDay': end,
                                 'volatility': historicalVolatility}, ignore_index=True)
-    drawChart(result, company)
+    result.to_csv('.\\EXCEL\\' + company + '\\' + company + '_Result.csv')
+    # drawChart(result, company)
 
 
 def getDataAndCalculate(company):
@@ -77,6 +78,8 @@ def getDataAndCalculate(company):
     calculateAndDraw(companyData, company)
 
 
-getDataAndCalculate('GOOG')
-getDataAndCalculate('AMZN')
 getDataAndCalculate('AAPL')
+getDataAndCalculate('AMZN')
+getDataAndCalculate('GOOG')
+getDataAndCalculate('GS')
+getDataAndCalculate('IBM')
