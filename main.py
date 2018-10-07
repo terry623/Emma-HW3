@@ -3,10 +3,17 @@ import pandas as pd
 import datetime
 import math
 
+# 選擇 2015 ~ 2018 年
 allDataStart = datetime.datetime(2016, 10, 1)
 allDataEnd = datetime.datetime(2018, 10, 1)
+
+# 一個月的天數
 dateRange = 30
+
+# 計算波動率的次數
 numberOfTimes = 500 - dateRange + 1
+
+# VIX與公司的對照表
 vixMap = {'AAPL': 'VXAPL',
           'AMZN': 'VXAZN',
           'GOOG': 'VXGOG',
@@ -16,8 +23,8 @@ vixMap = {'AAPL': 'VXAPL',
 
 def drawChart(result, company):
     title = company + ' ( ' + str(dateRange) + ' days' + ' )'
-    figure = result.plot(x="startDay", y='volatility', title=title)
-    picture = figure.set_xlabel("Number of Times").get_figure()
+    figure = result.plot(x='startDay', y='volatility', title=title)
+    picture = figure.set_xlabel('Number of Times').get_figure()
     picture.savefig('.\\OUTPUT\\' + company + '\\' + company + '_' +
                     str(dateRange) + 'DAYS.png')
 
@@ -60,13 +67,14 @@ def readStockAndDraw(company):
     result = pd.DataFrame(columns=['startDay', 'endDay', 'volatility'])
 
     # 從第二個開始算，因為要看前一天去算差值
+    print('\n---', company, '---')
     for start in range(1, numberOfTimes + 1):
         end = start + dateRange - 1
         populationMean = calculatePopulationMean(data, start, end)
         historicalVolatility = calculateVolatility(
             data, populationMean, start, end)
 
-        print('startDay:', start, ", endDay:", end,
+        print('startDay:', start, ', endDay:', end,
               ', volatility:', historicalVolatility)
 
         result = result.append({'startDay': start, 'endDay': end,
@@ -76,11 +84,13 @@ def readStockAndDraw(company):
 
 
 def readVIXAndDraw(company):
-    result = pd.read_csv('.\\VIX\\' + vixMap[company] + '.csv')
+    vix = pd.read_csv('.\\VIX\\' + vixMap[company] + '.csv')
+    vix['Date'] = pd.to_datetime(vix['Date'])
+    result = vix[(vix['Date'] > allDataStart) & (vix['Date'] <= allDataEnd)]
 
     title = company + ' ( VIX )'
-    figure = result.plot(x="Date", y='Close', title=title)
-    picture = figure.get_figure()
+    figure = result.plot(x='Date', y='Close', title=title)
+    picture = figure.set_xlabel('').get_figure()
     picture.savefig('.\\OUTPUT\\' + company + '\\' + company + '_VIX.png')
 
 
