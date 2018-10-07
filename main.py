@@ -16,7 +16,7 @@ def drawChart(result, company):
     figure = result.plot(x="startDay", y='volatility',
                          title=title)
     picture = figure.set_xlabel("Number of Times").get_figure()
-    picture.savefig('.\\OUTPUT\\' + company + '\\' + company + '.png')
+    picture.savefig('.\\OUTPUT\\' + company + '.png')
 
 
 def getVIX(company):
