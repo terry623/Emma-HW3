@@ -14,9 +14,9 @@ numberOfTimes = 500 - dateRange + 1
 def drawChart(result, company):
     title = company + ' ( ' + str(dateRange) + ' days' + ' )'
     figure = result.plot(x="startDay", y='volatility',
-                         title=title).get_figure()
-    # figure.set(xlabel='Number of Times')
-    figure.savefig('.\\OUTPUT\\' + company + '\\' + company + '.png')
+                         title=title)
+    picture = figure.set_xlabel("Number of Times").get_figure()
+    picture.savefig('.\\OUTPUT\\' + company + '\\' + company + '.png')
 
 
 def getVIX(company):
