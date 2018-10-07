@@ -1,27 +1,34 @@
 from pandas_datareader import data as pdr
 import pandas as pd
-import numpy as np
 import datetime
-import csv
 import math
 
 allDataStart = datetime.datetime(2016, 10, 1)
 allDataEnd = datetime.datetime(2018, 10, 1)
 dateRange = 30
 numberOfTimes = 500 - dateRange + 1
+vixMap = {'AAPL': 'VXAPL',
+          'AMZN': 'VXAZN',
+          'GOOG': 'VXGOG',
+          'GS': 'VXGS',
+          'IBM': 'VXIBM'}
 
 
 def drawChart(result, company):
     title = company + ' ( ' + str(dateRange) + ' days' + ' )'
-    figure = result.plot(x="startDay", y='volatility',
-                         title=title)
+    figure = result.plot(x="startDay", y='volatility', title=title)
     picture = figure.set_xlabel("Number of Times").get_figure()
     picture.savefig('.\\OUTPUT\\' + company + '\\' + company + '_' +
                     str(dateRange) + 'DAYS.png')
 
 
-def getVIX(company):
-    print('VIX Not Yet!')
+def drawVIX(company):
+    result = pd.read_csv('.\\VIX\\' + vixMap[company] + '.csv')
+
+    title = company + ' ( VIX )'
+    figure = result.plot(x="Date", y='Close', title=title)
+    picture = figure.get_figure()
+    picture.savefig('.\\OUTPUT\\' + company + '\\' + company + '_VIX.png')
 
 
 def calculatePopulationMean(data, start, end):
@@ -79,6 +86,7 @@ def calculateAndDraw(companyData, company):
 def getDataAndCalculate(company):
     companyData = pdr.DataReader(company, 'yahoo', allDataStart, allDataEnd)
     calculateAndDraw(companyData, company)
+    drawVIX(company)
 
 
 getDataAndCalculate('AAPL')
