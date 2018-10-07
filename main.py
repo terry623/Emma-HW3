@@ -22,15 +22,6 @@ def drawChart(result, company):
                     str(dateRange) + 'DAYS.png')
 
 
-def drawVIX(company):
-    result = pd.read_csv('.\\VIX\\' + vixMap[company] + '.csv')
-
-    title = company + ' ( VIX )'
-    figure = result.plot(x="Date", y='Close', title=title)
-    picture = figure.get_figure()
-    picture.savefig('.\\OUTPUT\\' + company + '\\' + company + '_VIX.png')
-
-
 def calculatePopulationMean(data, start, end):
     firstDay = data[start]
     lastDay = data[end]
@@ -60,7 +51,8 @@ def calculateVolatility(data, mean, start, end):
     return historicalVolatility
 
 
-def calculateAndDraw(companyData, company):
+def readStockAndDraw(company):
+    companyData = pdr.DataReader(company, 'yahoo', allDataStart, allDataEnd)
     companyData.sort_index(ascending=False, inplace=True)
     companyData.to_csv('.\\EXCEL\\' + company + '\\' + company + '.csv')
     data = companyData['Close']
@@ -83,10 +75,18 @@ def calculateAndDraw(companyData, company):
     drawChart(result, company)
 
 
+def readVIXAndDraw(company):
+    result = pd.read_csv('.\\VIX\\' + vixMap[company] + '.csv')
+
+    title = company + ' ( VIX )'
+    figure = result.plot(x="Date", y='Close', title=title)
+    picture = figure.get_figure()
+    picture.savefig('.\\OUTPUT\\' + company + '\\' + company + '_VIX.png')
+
+
 def getDataAndCalculate(company):
-    companyData = pdr.DataReader(company, 'yahoo', allDataStart, allDataEnd)
-    calculateAndDraw(companyData, company)
-    drawVIX(company)
+    readStockAndDraw(company)
+    readVIXAndDraw(company)
 
 
 getDataAndCalculate('AAPL')
