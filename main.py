@@ -24,9 +24,9 @@ vixMap = {'AAPL': 'VXAPL',
 # 將波動率結果畫出來，並輸出成圖片
 def drawChart(result, company):
     title = company + ' ( ' + str(dateRange) + ' days' + ' )'
-    figure = result.plot(x='startDay', y='volatility', title=title)
-    picture = figure.set_xlabel('Number of Times').get_figure()
-    picture.savefig('.\\OUTPUT\\' + company + '\\' + company + '_' +
+    resultPlot = result.plot(x='startDay', y='volatility', title=title)
+    figure = resultPlot.set_xlabel('Number of Times').get_figure()
+    figure.savefig('.\\OUTPUT\\' + company + '\\' + company + '_' +
                     str(dateRange) + 'DAYS.png')
 
 
@@ -112,9 +112,9 @@ def readVIXAndDraw(company):
 
     # 將資料畫出來，並輸出成圖片
     title = company + ' ( VIX )'
-    figure = result.plot(x='Date', y='Close', title=title)
-    picture = figure.set_xlabel('').get_figure()
-    picture.savefig('.\\OUTPUT\\' + company + '\\' + company + '_VIX.png')
+    resultPlot = result.plot(x='Date', y='Close', title=title)
+    figure = resultPlot.set_xlabel('').get_figure()
+    figure.savefig('.\\OUTPUT\\' + company + '\\' + company + '_VIX.png')
 
 
 # 作業要求的兩件工作
